@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script type='text/javascript' src='//racesmoulderstamp.com/80/93/ba/8093baf87056ee75c4d23544972b53ee.js'></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SinFlix</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #141414; /* Netflix dark background */
+            color: #e5e5e5; /* Light grey text */
+            overflow-x: hidden; /* Prevent horizontal scroll */
+        }
+        /* Custom scrollbar for webkit browsers */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #222;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        .header-scrolled {
+            background-color: #141414;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        .video-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            height: 0;
+            overflow: hidden;
+            background-color: black;
+        }
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .back-button {
+            background-color: rgba(109, 109, 110, 0.7); /* Grey with transparency */
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+        .back-button:hover {
+            background-color: rgba(109, 109, 110, 0.9);
+        }
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .detail-content {
+                padding: 1rem;
+            }
+            .detail-content h1 {
+                font-size: 2.5rem;
+            }
+            .detail-content p {
+                font-size: 0.9rem;
+            }
+        }
+        @media (max-width: 480px) {
+            .detail-content h1 {
+                font-size: 2rem;
+            }
+            .detail-content p {
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Header (simplified for detail page) -->
+    <header id="main-header" class="fixed top-0 left-0 w-full z-50 transition-all duration-300 ease-in-out bg-black py-4 px-8 md:px-16 flex items-center justify-between shadow-lg">
+        <div class="flex items-center">
+            <a href="../index.html" class="back-button mr-4">
+                <svg class="w-5 h-5 inline-block mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"></path></svg>
+                Back to Home
+            </a>
+            <div class="header-logo text-red-600 text-3xl font-bold rounded-md">SINFLIX</div>
+        </div>
+        <div class="header-right flex items-center space-x-6">
+            <!-- User Avatar (Placeholder) -->
+            <img src="https://placehold.co/40x40/FF0000/FFFFFF?text=U" alt="User Avatar" class="w-10 h-10 rounded-md cursor-pointer">
+        </div>
+    </header>
+
+    <!-- Movie Detail Section -->
+    <section class="pt-24 md:pt-32 pb-12 px-4 md:px-16">
+        <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;">
+            <iframe src="https://geo.dailymotion.com/player.html?video=x8yo6fi"
+                style="width:100%; height:100%; position:absolute; left:0px; top:0px; overflow:hidden; border:none;"
+                allowfullscreen
+                title="Dailymotion Video Player"
+                allow="web-share">
+            </iframe>
+        </div>
+
+        <script async="async" data-cfasync="false" src="//racesmoulderstamp.com/eb8a30f70e4ca8334f2fb7c80107805a/invoke.js"></script>
+        <div id="container-eb8a30f70e4ca8334f2fb7c80107805a"></div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-black py-10 text-center text-gray-400 text-sm">
+        <div class="container mx-auto px-8 md:px-16">
+            <p>&copy; <span id="year"></span> SinFlix by RandunLabz. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+
+        document.getElementById("year").textContent = new Date().getFullYear();
+        // Function to parse URL parameters
+        function getUrlParameter(name) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(name);
+  }
+
+        // Dummy movie data (replace with real API fetch in a production app)
+        const moviesData = {
+            "1": {
+                title: "Inception",
+                genre: "Action, Sci-Fi",
+                description: "A thief steals secrets using dream-sharing tech.",
+                year: "2010",
+                rating: "8.8",
+                duration: "2h 28min",
+                videoUrl: "https://example.com/inception.mp4"
+            },
+      
+  };
+
+        window.onload = () => {
+      const movieId = getUrlParameter('id');
+      const movie = moviesData[movieId];
+
+      if (movie) {
+          document.title = movie.title + ' - Netflix Clone';
+          document.getElementById('movie-title').textContent = movie.title;
+          document.getElementById('movie-genre').textContent = movie.genre;
+          document.getElementById('movie-description').textContent = movie.description;
+          document.getElementById('movie-year').textContent = movie.year;
+          document.getElementById('movie-rating').textContent = movie.rating;
+          document.getElementById('movie-duration').textContent = movie.duration;
+          document.getElementById('movie-player').src = movie.videoUrl;
+      } else {
+          document.title = 'Movie Not Found - Netflix Clone';
+          document.getElementById('movie-title').textContent = 'Movie Not Found';
+          document.getElementById('movie-genre').textContent = '';
+          document.getElementById('movie-description').textContent = 'The movie you are looking for could not be found.';
+          document.getElementById('movie-year').textContent = 'N/A';
+          document.getElementById('movie-rating').textContent = 'N/A';
+          document.getElementById('movie-duration').textContent = 'N/A';
+          document.getElementById('movie-player').src = '';
+      }
+  };
+    </script>
+</body>
+</html>

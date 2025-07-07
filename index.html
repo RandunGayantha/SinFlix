@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" type="image/png" href="https://i.ibb.co/yBqS3snt/3698776-1.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SinFlix</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #141414; /* Netflix dark background */
+            color: #e5e5e5; /* Light grey text */
+            overflow-x: hidden; /* Prevent horizontal scroll */
+        }
+        /* Custom scrollbar for webkit browsers */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #222;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        .header-scrolled {
+            background-color: #141414;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        .hero-section {
+            background-image: url('https://image.tmdb.org/t/p/original/qn7GWOvzTl9w7bUMSEpue9WzkkB.jpg'); /* Placeholder for hero image */
+            background-size: cover;
+            background-position: center;
+            height: 80vh; /* Adjust height as needed */
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+        .hero-section::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 150px; /* Gradient height */
+            background: linear-gradient(to top, #141414, transparent);
+        }
+        .content-row-container {
+            position: relative;
+            margin-top: -80px; /* Overlap with hero section */
+            z-index: 10;
+        }
+        /* Modified content-row for responsive wrapping */
+        .content-row {
+            display: flex;
+            flex-wrap: wrap; /* Allow items to wrap to the next line */
+            gap: 1rem; /* Spacing between cards */
+            padding: 1rem 0;
+            /* No overflow-x: scroll needed anymore */
+        }
+        .content-row::-webkit-scrollbar {
+            display: none; /* Hide scrollbar for a cleaner look */
+        }
+        /* Modified content-card for responsive widths */
+        .content-card {
+            flex-shrink: 0; /* Do not shrink */
+            width: calc(50% - 0.5rem); /* 2 cards per row on small screens, accounting for gap */
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            cursor: pointer;
+            border-radius: 0.5rem; /* Rounded corners for cards */
+            overflow: hidden; /* Ensure content respects border-radius */
+            margin-bottom: 0; /* Gap handles spacing now */
+        }
+        /* Tailwind responsive prefixes for content-card width */
+        @media (min-width: 640px) { /* sm breakpoint */
+            .content-card {
+                width: calc(33.333% - 0.666rem); /* 3 cards per row */
+            }
+        }
+        @media (min-width: 768px) { /* md breakpoint */
+            .content-card {
+                width: calc(25% - 0.75rem); /* 4 cards per row */
+            }
+        }
+        @media (min-width: 1024px) { /* lg breakpoint */
+            .content-card {
+                width: calc(20% - 0.8rem); /* 5 cards per row */
+            }
+        }
+        @media (min-width: 1280px) { /* xl breakpoint */
+            .content-card {
+                width: calc(16.666% - 0.833rem); /* 6 cards per row */
+            }
+        }
+
+        .content-card:hover {
+            transform: scale(1.05); /* Enlarge on hover */
+            box-shadow: 0 0 15px rgba(229, 229, 229, 0.3); /* Subtle shadow on hover */
+        }
+        .content-card img {
+            width: 100%;
+            height: 160px; /* Fixed height for image */
+            object-fit: cover; /* Cover the area, crop if necessary */
+            border-radius: 0.5rem 0.5rem 0 0; /* Rounded top corners */
+        }
+        .content-card-info {
+            padding: 0.75rem;
+            background-color: #222; /* Darker background for info */
+            border-radius: 0 0 0.5rem 0.5rem; /* Rounded bottom corners */
+        }
+        .play-button {
+            background-color: #e50914; /* Netflix red */
+            color: white;
+            padding: 0.75rem 2rem;
+            border-radius: 0.25rem;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+        .play-button:hover {
+            background-color: #f40612; /* Slightly brighter red on hover */
+        }
+        .more-info-button {
+            background-color: rgba(109, 109, 110, 0.7); /* Grey with transparency */
+            color: white;
+            padding: 0.75rem 2rem;
+            border-radius: 0.25rem;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+        .more-info-button:hover {
+            background-color: rgba(109, 109, 110, 0.9);
+        }
+        /* Search bar specific styles */
+        .search-container {
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+        .search-input {
+            background-color: rgba(0, 0, 0, 0.7);
+            border: 1px solid #e5e5e5;
+            color: #e5e5e5;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            width: 0; /* Start hidden */
+            opacity: 0;
+            transition: width 0.3s ease, opacity 0.3s ease;
+            margin-left: 0;
+        }
+        .search-input.active {
+            width: 200px; /* Expand width */
+            opacity: 1;
+            margin-left: 1rem;
+        }
+        .search-icon {
+            cursor: pointer;
+            z-index: 1; /* Ensure icon is clickable */
+        }
+
+        /* Responsive adjustments for overall layout */
+        @media (max-width: 768px) {
+            .hero-section {
+                height: 60vh;
+            }
+            .hero-content h1 {
+                font-size: 2.5rem;
+            }
+            .hero-content p {
+                font-size: 0.9rem;
+                width: 90%;
+            }
+            .header-nav ul li {
+                margin-left: 1rem;
+            }
+            .search-input.active {
+                width: 150px; /* Adjust for smaller screens */
+            }
+        }
+        @media (max-width: 480px) {
+            .hero-section {
+                height: 50vh;
+            }
+            .hero-content h1 {
+                font-size: 2rem;
+            }
+            .hero-content p {
+                display: none; /* Hide description on very small screens */
+            }
+            .header-nav {
+                display: none; /* Hide nav items on very small screens */
+            }
+            .header-right {
+                margin-left: auto; /* Push search/avatar to right */
+            }
+            .header-logo {
+                font-size: 1.5rem;
+            }
+            .search-input.active {
+                width: 100px; /* Even smaller for mobile */
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Header -->
+    <header id="main-header" class="fixed top-0 left-0 w-full z-50 transition-all duration-300 ease-in-out bg-transparent py-4 px-8 md:px-16 flex items-center justify-between">
+        <div class="flex items-center">
+            <div class="header-logo text-red-600 text-4xl font-bold mr-8 rounded-md"><a href="index.html">SINFLIX</a></div>
+            <nav class="header-nav hidden md:block">
+                <ul class="flex space-x-6 text-lg">
+                    <li><a href="index.html" class="hover:text-gray-300 transition-colors duration-200"></a></li>
+                    
+                </ul>
+            </nav>
+        </div>
+        <div class="header-right flex items-center space-x-6">
+            <!-- Search Container -->
+            <div class="search-container">
+                <input type="text" id="search-input" class="search-input" placeholder="Titles, people, genres">
+                <svg id="search-icon" class="w-6 h-6 search-icon text-white hover:text-gray-300 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            </div>
+            <span class="hidden md:block text-lg cursor-pointer hover:text-gray-300 transition-colors duration-200"></span>
+            <!-- Notification Bell (Placeholder) -->
+            <svg class="w-6 h-6 cursor-pointer hover:text-gray-300 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+            <!-- User Avatar (Placeholder) -->
+            <img src="https://placehold.co/40x40/FF0000/FFFFFF?text=U" alt="User Avatar" class="w-10 h-10 rounded-md cursor-pointer">
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-section text-white px-8 md:px-16">
+        <div class="hero-content max-w-2xl">
+            <h1 class="text-5xl md:text-6xl font-extrabold mb-4 drop-shadow-lg">Visal Adare</h1>
+            <p class="text-lg mb-8 leading-relaxed drop-shadow-md hidden md:block">
+                Be captivated by the mesmerizing story of Thaadi, Shavin, Sarah and Anud; as their destinies intertwine in a tale that will stay with you long after the credits roll.
+            </p>
+            <div class="flex space-x-4">
+                <a href="Movies/visalAdare.html">
+                <button class="play-button flex items-center space-x-2 rounded-md">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg>
+                    <span>Play</span>
+                </button></a>
+                
+            </div>
+        </div>
+    </section>
+
+    <!-- Content Rows - All content will be displayed here for search -->
+    <div class="content-row-container px-8 md:px-16 pb-12">
+        <h2 class="text-2xl font-semibold mb-4 mt-8">All Titles</h2>
+        <div class="content-row" id="all-titles">
+            <!-- More content cards for responsive display -->
+
+                <div class="content-card" data-movie-id="visaladare" data-movie-title="Visal Adare">
+                    <a href="Movies/visalAdare.html">
+                        <img src="https://image.tmdb.org/t/p/original/qn7GWOvzTl9w7bUMSEpue9WzkkB.jpg" alt="visaladare">
+                        <div class="content-card-info">
+                            <h3 class="text-lg font-medium">Visal Adare</h3>
+                            <p class="text-sm text-gray-400">Drama, Romance</p>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="content-card" data-movie-id="suhadakoka" data-movie-title="Suhada Koka">
+                    <a href="Movies/suhadakoka.html">
+                        <img src="https://content.roopahala.com.au/uploads/thumbnail/2024/02/Suhada_Koka_1280x800.jpg" alt="Movie 1">
+                        <div class="content-card-info">
+                            <h3 class="text-lg font-medium">Suhada Koka</h3>
+                            <p class="text-sm text-gray-400">Comedy</p>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="content-card" data-movie-id="kathuruMithuru" data-movie-title="Kathuru Mithuru">
+                    <a href="Movies/kathuruMithuru.html">
+                        <img src="https://i.ytimg.com/vi/eXfk7hTsmGQ/maxresdefault.jpg" alt="kathuruMithuru">
+                        <div class="content-card-info">
+                            <h3 class="text-lg font-medium">Kathuru Mithuru</h3>
+                            <p class="text-sm text-gray-400">Comedy</p>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="content-card" data-movie-id="apePrincipal" data-movie-title="Ape Principal">
+                    <a href="Movies/apePrincipal.html">
+                        <img src="https://m.media-amazon.com/images/M/MV5BMTg4NmQ5NDItNzg0OS00MGNiLWI1NzUtMGI2OGUwNzUzMDU5XkEyXkFqcGc@._V1_.jpg" alt="Ape Principal">
+                        <div class="content-card-info">
+                            <h3 class="text-lg font-medium">Ape Principal</h3>
+                            <p class="text-sm text-gray-400">Drama</p>
+                        </div>
+                    </a>
+                </div>
+
+                
+            
+            
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-black py-10 text-center text-gray-400 text-sm">
+        <div class="container mx-auto px-8 md:px-16">
+            <div class="flex justify-center space-x-6 mb-6">
+                <p href="#" class="hover:text-gray-200">This website does not host any movies. All content is linked from third-party sources.</p>
+                <a href="#" class="hover:text-gray-200"></a>
+                <a href="#" class="hover:text-gray-200"></a>
+            </div>
+            <p>&copy; <span id="year"></span> SinFlix by RandunLabz. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById("year").textContent = new Date().getFullYear();
+        // JavaScript for header scroll effect
+        window.addEventListener('scroll', () => {
+            const header = document.getElementById('main-header');
+            if (window.scrollY > 50) {
+                header.classList.add('header-scrolled');
+                header.classList.remove('bg-transparent');
+            } else {
+                header.classList.remove('header-scrolled');
+                header.classList.add('bg-transparent');
+            }
+        });
+
+        // Search bar functionality
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchIcon = document.getElementById('search-icon');
+            const searchInput = document.getElementById('search-input');
+            const contentCards = document.querySelectorAll('.content-card');
+
+            // Toggle search input visibility
+            searchIcon.addEventListener('click', () => {
+                searchInput.classList.toggle('active');
+                if (searchInput.classList.contains('active')) {
+                    searchInput.focus(); // Focus on input when active
+                } else {
+                    searchInput.value = ''; // Clear search when hiding
+                    filterContentCards(''); // Show all cards
+                }
+            });
+
+            // Filter content cards based on search input
+            searchInput.addEventListener('input', (event) => {
+                const searchTerm = event.target.value.toLowerCase();
+                filterContentCards(searchTerm);
+            });
+
+            function filterContentCards(searchTerm) {
+                contentCards.forEach(card => {
+                    const movieTitle = card.getAttribute('data-movie-title').toLowerCase();
+                    if (movieTitle.includes(searchTerm)) {
+                        card.style.display = 'block'; // Show the card
+                    } else {
+                        card.style.display = 'none'; // Hide the card
+                    }
+                });
+            }
+
+            // Add event listeners to content cards to navigate to the detail page
+            contentCards.forEach(card => {
+                card.addEventListener('click', (event) => {
+                    // Prevent navigation if clicking on elements *inside* the card that might have their own actions
+                    // This is a simple check; for more complex interactions, consider event delegation or specific button clicks.
+                    if (event.target.tagName === 'IMG' || event.target.tagName === 'H3' || event.target.tagName === 'P' || event.target.classList.contains('content-card-info')) {
+                        const movieId = card.getAttribute('data-movie-id');
+                        if (movieId) {
+                            window.location.href = `movie-detail.html?id=${movieId}`;
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
